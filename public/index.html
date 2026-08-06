@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sriramoju Nikhil Chary — Data & Systems Portfolio</title>
+<meta name="description" content="Portfolio of Sriramoju Nikhil Chary — data analytics, distributed systems, and AI agent projects.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<style>
+  :root{
+    --bg-primary:#0A0E17;
+    --bg-panel:#10151F;
+    --bg-panel-2:#141B27;
+    --accent-cyan:#4FD8C4;
+    --accent-amber:#F2A649;
+    --text-primary:#E7ECF3;
+    --text-muted:#8B96A8;
+    --border:#1E2633;
+    --radius:10px;
+    --max-w:1120px;
+    --font-display:'Space Grotesk', sans-serif;
+    --font-body:'Inter', sans-serif;
+    --font-mono:'IBM Plex Mono', monospace;
+  }
+
+  *{ box-sizing:border-box; margin:0; padding:0; }
+
+  html{ scroll-behavior:smooth; }
+
+  body{
+    background:var(--bg-primary);
+    color:var(--text-primary);
+    font-family:var(--font-body);
+    line-height:1.6;
+    overflow-x:hidden;
+  }
+
+  a{ color:inherit; text-decoration:none; }
+
+  ::selection{ background:var(--accent-cyan); color:#04110E; }
+
+  *:focus-visible{
+    outline:2px solid var(--accent-cyan);
+    outline-offset:3px;
+    border-radius:2px;
+  }
+
+  /* ---------- background canvas ---------- */
+  #bg-canvas{
+    position:fixed;
+    inset:0;
+    width:100%;
+    height:100%;
+    z-index:0;
+    display:block;
+  }
+
+  #scroll-glow{
+    position:fixed;
+    left:50%;
+    top:-20%;
+    width:900px;
+    height:900px;
+    transform:translate(-50%,-50%);
+    background:radial-gradient(circle, rgba(79,216,196,0.15), rgba(242,166,73,0.07) 45%, transparent 70%);
+    filter:blur(70px);
+    z-index:0;
+    pointer-events:none;
+    will-change:top;
+  }
+  @media (max-width:640px){
+    #scroll-glow{ width:600px; height:600px; }
+  }
+
+  /* ---------- layout helpers ---------- */
+  .wrap{
+    position:relative;
+    z-index:1;
+    max-width:var(--max-w);
+    margin:0 auto;
+    padding:0 24px;
+  }
+
+  .eyebrow{
+    font-family:var(--font-mono);
+    font-size:0.78rem;
+    letter-spacing:0.06em;
+    color:var(--accent-cyan);
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:14px;
+    text-transform:none;
+  }
+
+  .eyebrow::before{
+    content:"";
+    width:14px;
+    height:1px;
+    background:var(--accent-cyan);
+    display:inline-block;
+  }
+
+  .section-title{
+    font-family:var(--font-display);
+    font-weight:600;
+    font-size:clamp(1.6rem, 3vw, 2.3rem);
+    letter-spacing:-0.01em;
+    margin-bottom:20px;
+  }
+
+  section{
+    position:relative;
+    z-index:1;
+    padding:96px 0;
+  }
+
+  /* ---------- reveal-on-scroll ---------- */
+  .reveal{
+    opacity:0;
+    transform:translateY(26px);
+    transition:opacity .7s ease, transform .7s ease;
+  }
+  .reveal.in-view{
+    opacity:1;
+    transform:none;
+  }
+  @media (prefers-reduced-motion: reduce){
+    .reveal{ opacity:1 !important; transform:none !important; transition:none !important; }
+  }
+
+  /* ---------- nav ---------- */
+  header{
+    position:fixed;
+    top:0; left:0; right:0;
+    z-index:20;
+    backdrop-filter:blur(10px);
+    background:rgba(10,14,23,0.55);
+    border-bottom:1px solid var(--border);
+  }
+
+  nav{
+    max-width:var(--max-w);
+    margin:0 auto;
+    padding:16px 24px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+
+  .logo{
+    font-family:var(--font-mono);
+    font-size:0.92rem;
+    color:var(--text-primary);
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .logo .dot{ color:var(--accent-cyan); }
+
+  .status-pill{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    font-family:var(--font-mono);
+    font-size:0.72rem;
+    color:var(--text-muted);
+    border:1px solid var(--border);
+    padding:5px 10px;
+    border-radius:100px;
+  }
+
+  .status-dot{
+    width:7px; height:7px;
+    border-radius:50%;
+    background:var(--accent-cyan);
+    box-shadow:0 0 0 0 rgba(79,216,196,0.6);
+    animation:pulse 2.2s infinite;
+  }
+  @media (prefers-reduced-motion: reduce){ .status-dot{ animation:none; } }
+
+  @keyframes pulse{
+    0%{ box-shadow:0 0 0 0 rgba(79,216,196,0.55); }
+    70%{ box-shadow:0 0 0 7px rgba(79,216,196,0); }
+    100%{ box-shadow:0 0 0 0 rgba(79,216,196,0); }
+  }
+
+  .nav-links{
+    display:flex;
+    gap:28px;
+    font-family:var(--font-mono);
+    font-size:0.82rem;
+    color:var(--text-muted);
+  }
+  .nav-links a:hover, .nav-links a:focus-visible{ color:var(--accent-cyan); }
+
+  .nav-right{ display:flex; align-items:center; gap:18px; }
+
+  .nav-toggle{
+    display:none;
+    flex-direction:column;
+    gap:4px;
+    background:none;
+    border:none;
+    cursor:pointer;
+    padding:6px;
+  }
+  .nav-toggle span{
+    width:20px; height:2px;
+    background:var(--text-primary);
+    display:block;
+  }
+
+  /* ---------- hero ---------- */
+  #hero{
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    padding-top:80px;
+  }
+
+  .hero-name{
+    font-family:var(--font-display);
+    font-weight:700;
+    font-size:clamp(2.3rem, 6.4vw, 4.6rem);
+    line-height:1.05;
+    letter-spacing:-0.02em;
+    margin-bottom:18px;
+    max-width:14ch;
+  }
+
+  .hero-sub{
+    font-size:clamp(1rem, 1.7vw, 1.2rem);
+    color:var(--text-muted);
+    max-width:52ch;
+    margin-bottom:36px;
+  }
+  .hero-sub .hl{ color:var(--accent-cyan); }
+
+  .hero-actions{
+    display:flex;
+    gap:14px;
+    flex-wrap:wrap;
+    margin-bottom:56px;
+  }
+
+  .btn{
+    font-family:var(--font-mono);
+    font-size:0.85rem;
+    padding:12px 20px;
+    border-radius:6px;
+    border:1px solid var(--border);
+    transition:border-color .2s ease, transform .2s ease, background .2s ease;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+  }
+  .btn-primary{
+    background:var(--accent-cyan);
+    color:#04110E;
+    border-color:var(--accent-cyan);
+    font-weight:600;
+  }
+  .btn-primary:hover, .btn-primary:focus-visible{ transform:translateY(-2px); }
+  .btn-ghost{ color:var(--text-primary); }
+  .btn-ghost:hover, .btn-ghost:focus-visible{ border-color:var(--accent-cyan); color:var(--accent-cyan); }
+
+  .hero-meta{
+    display:flex;
+    gap:32px;
+    flex-wrap:wrap;
+    font-family:var(--font-mono);
+    font-size:0.78rem;
+    color:var(--text-muted);
+  }
+  .hero-meta strong{ color:var(--text-primary); display:block; font-size:0.9rem; margin-bottom:2px; font-family:var(--font-body); font-weight:600; }
+
+  .scroll-cue{
+    position:absolute;
+    bottom:34px;
+    left:24px;
+    font-family:var(--font-mono);
+    font-size:0.7rem;
+    color:var(--text-muted);
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .scroll-cue .line{
+    width:1px; height:34px;
+    background:linear-gradient(var(--accent-cyan), transparent);
+  }
+
+  /* ---------- panel background wash for readability over canvas ---------- */
+  .panel-bg{
+    background:linear-gradient(180deg, rgba(10,14,23,0.2), rgba(10,14,23,0.86) 12%, rgba(10,14,23,0.92) 88%, rgba(10,14,23,0.2));
+  }
+
+  /* ---------- about ---------- */
+  .about-grid{
+    display:grid;
+    grid-template-columns:1.3fr 1fr;
+    gap:48px;
+    align-items:start;
+  }
+  .about-bio p{ color:var(--text-muted); margin-bottom:16px; max-width:56ch; }
+  .about-bio p strong{ color:var(--text-primary); font-weight:600; }
+
+  .facts-panel{
+    background:var(--bg-panel);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:22px;
+  }
+  .fact-row{
+    display:flex;
+    justify-content:space-between;
+    gap:12px;
+    padding:12px 0;
+    border-bottom:1px solid var(--border);
+    font-size:0.9rem;
+  }
+  .fact-row:last-child{ border-bottom:none; }
+  .fact-key{ font-family:var(--font-mono); color:var(--text-muted); font-size:0.8rem; }
+  .fact-val{ text-align:right; color:var(--text-primary); }
+
+  /* ---------- skills / schema table ---------- */
+  .schema-table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:0.9rem;
+    background:var(--bg-panel);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    overflow:hidden;
+  }
+  .schema-table thead th{
+    text-align:left;
+    font-family:var(--font-mono);
+    font-size:0.72rem;
+    letter-spacing:0.05em;
+    color:var(--accent-cyan);
+    background:var(--bg-panel-2);
+    padding:12px 18px;
+    border-bottom:1px solid var(--border);
+  }
+  .schema-table td{
+    padding:14px 18px;
+    border-bottom:1px solid var(--border);
+    vertical-align:top;
+  }
+  .schema-table tr:last-child td{ border-bottom:none; }
+  .field-name{ font-family:var(--font-mono); color:var(--text-primary); white-space:nowrap; }
+  .field-type{ font-family:var(--font-mono); color:var(--accent-amber); font-size:0.82rem; white-space:nowrap; }
+  .field-note{ color:var(--text-muted); }
+
+  /* ---------- projects ---------- */
+  .project-grid{
+    display:grid;
+    gap:22px;
+  }
+  .term-card{
+    background:var(--bg-panel);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    overflow:hidden;
+    transition:transform .25s ease, border-color .25s ease;
+  }
+  .term-card:hover{ transform:translateY(-4px); border-color:rgba(79,216,196,0.4); }
+
+  .term-loading{
+    font-family:var(--font-mono);
+    color:var(--text-muted);
+    font-size:0.9rem;
+    padding:18px 2px;
+  }
+
+  .term-bar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:12px 18px;
+    background:var(--bg-panel-2);
+    border-bottom:1px solid var(--border);
+    font-family:var(--font-mono);
+    font-size:0.82rem;
+    color:var(--text-muted);
+  }
+
+  .status-tag{
+    font-family:var(--font-mono);
+    font-size:0.68rem;
+    padding:3px 9px;
+    border-radius:100px;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+  }
+  .status-tag.shipped{ color:var(--accent-cyan); border:1px solid rgba(79,216,196,0.35); }
+  .status-tag.progress{ color:var(--accent-amber); border:1px solid rgba(242,166,73,0.35); }
+
+  .term-body{ padding:22px; }
+  .term-title{
+    font-family:var(--font-display);
+    font-weight:600;
+    font-size:1.25rem;
+    margin-bottom:10px;
+  }
+  .term-desc{ color:var(--text-muted); margin-bottom:18px; max-width:70ch; }
+
+  .tag-row{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px; }
+  .tag{
+    font-family:var(--font-mono);
+    font-size:0.72rem;
+    color:var(--text-muted);
+    border:1px solid var(--border);
+    padding:4px 10px;
+    border-radius:5px;
+  }
+
+  .term-link{
+    font-family:var(--font-mono);
+    font-size:0.82rem;
+    color:var(--accent-cyan);
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+  }
+  .term-link:hover, .term-link:focus-visible{ text-decoration:underline; }
+
+  /* ---------- experience timeline ---------- */
+  .timeline{ position:relative; padding-left:28px; }
+  .timeline::before{
+    content:"";
+    position:absolute;
+    left:5px; top:6px; bottom:6px;
+    width:1px;
+    background:var(--border);
+  }
+  .tl-item{ position:relative; padding-bottom:34px; }
+  .tl-item:last-child{ padding-bottom:0; }
+  .tl-item::before{
+    content:"";
+    position:absolute;
+    left:-28px; top:5px;
+    width:9px; height:9px;
+    border-radius:50%;
+    background:var(--accent-cyan);
+  }
+  .tl-date{
+    font-family:var(--font-mono);
+    font-size:0.76rem;
+    color:var(--accent-amber);
+    margin-bottom:6px;
+    display:block;
+  }
+  .tl-title{ font-weight:600; margin-bottom:4px; }
+  .tl-org{ color:var(--text-muted); font-size:0.92rem; }
+
+  /* ---------- certifications ---------- */
+  .cred-summary{
+    font-family:var(--font-mono);
+    font-size:0.82rem;
+    color:var(--text-muted);
+    margin-bottom:32px;
+  }
+  .cred-group{ margin-bottom:28px; }
+  .cred-group-title{
+    font-family:var(--font-mono);
+    font-size:0.76rem;
+    color:var(--accent-cyan);
+    margin-bottom:12px;
+  }
+  .cred-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(230px, 1fr));
+    gap:12px;
+  }
+  .cred-card{
+    background:var(--bg-panel);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:14px 16px;
+    transition:border-color .2s ease, transform .2s ease;
+  }
+  .cred-card:hover{ border-color:rgba(79,216,196,0.4); transform:translateY(-2px); }
+  .cred-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:10px;
+    margin-bottom:6px;
+  }
+  .cred-title{
+    font-weight:600;
+    font-size:0.92rem;
+    line-height:1.35;
+    color:var(--text-primary);
+  }
+  .cred-date{
+    font-family:var(--font-mono);
+    font-size:0.68rem;
+    color:var(--accent-amber);
+    white-space:nowrap;
+    padding-top:3px;
+  }
+  .cred-issuer{
+    font-family:var(--font-mono);
+    font-size:0.72rem;
+    color:var(--text-muted);
+  }
+
+  /* ---------- contact ---------- */
+  .contact-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:40px;
+    align-items:start;
+  }
+  .query-block{
+    background:var(--bg-panel);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:22px 24px;
+    font-family:var(--font-mono);
+    font-size:0.86rem;
+    line-height:1.9;
+    color:var(--text-muted);
+  }
+  .query-block .kw{ color:var(--accent-cyan); }
+  .query-block .cm{ color:#5A6472; }
+  .query-block .str{ color:var(--accent-amber); }
+
+  .contact-links{ display:flex; flex-direction:column; gap:16px; }
+  .contact-link{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    padding:16px 18px;
+    background:var(--bg-panel);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    font-size:0.94rem;
+    transition:border-color .2s ease;
+  }
+  .contact-link:hover, .contact-link:focus-visible{ border-color:rgba(79,216,196,0.4); }
+  .contact-link .k{ font-family:var(--font-mono); font-size:0.72rem; color:var(--text-muted); display:block; margin-bottom:2px; }
+  .contact-link .v{ color:var(--text-primary); }
+  .contact-link .placeholder{ color:var(--text-muted); font-style:italic; }
+
+  footer{
+    position:relative; z-index:1;
+    text-align:center;
+    padding:40px 24px 60px;
+    font-family:var(--font-mono);
+    font-size:0.76rem;
+    color:var(--text-muted);
+  }
+
+  /* ---------- responsive ---------- */
+  @media (max-width:860px){
+    .about-grid, .contact-grid{ grid-template-columns:1fr; }
+    .nav-links{
+      position:fixed;
+      top:64px; right:0;
+      background:var(--bg-panel);
+      border:1px solid var(--border);
+      border-radius:0 0 0 10px;
+      flex-direction:column;
+      gap:0;
+      transform:translateX(110%);
+      transition:transform .25s ease;
+    }
+    .nav-links.open{ transform:translateX(0); }
+    .nav-links a{ padding:14px 22px; border-bottom:1px solid var(--border); }
+    .nav-toggle{ display:flex; }
+  }
+
+  @media (max-width:520px){
+    section{ padding:72px 0; }
+    .hero-meta{ gap:22px; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+<div id="scroll-glow"></div>
+
+<header>
+  <nav>
+    <div class="logo"><span class="dot">$</span> sriramoju.nikhil</div>
+    <div class="nav-links" id="navLinks">
+      <a href="#about">about</a>
+      <a href="#skills">skills</a>
+      <a href="#projects">projects</a>
+      <a href="#experience">experience</a>
+      <a href="#certifications">certifications</a>
+      <a href="garage.html">garage</a>
+      <a href="#contact">contact</a>
+    </div>
+    <div class="nav-right">
+      <span class="status-pill"><span class="status-dot"></span>3 nodes online</span>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+</header>
+
+<main>
+
+  <section id="hero" class="wrap">
+    <p class="eyebrow">$ whoami</p>
+    <h1 class="hero-name">Sriramoju Nikhil Chary</h1>
+    <p class="hero-sub">Final-year CSE student who treats <span class="hl">data</span> as the raw material and <span class="hl">distributed systems</span> as the workshop — building agents that query data in plain language and infrastructure that keeps working when a node goes down.</p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="#projects">View projects</a>
+      <a class="btn btn-ghost" href="https://github.com/Nikhil-creat" target="_blank" rel="noopener">GitHub ↗</a>
+      <a class="btn btn-ghost" href="https://in.linkedin.com/in/nikhil-chary-sriramoju-95041b38a" target="_blank" rel="noopener">LinkedIn ↗</a>
+    </div>
+    <div class="hero-meta">
+      <div><strong>Vaagdevi College of Engineering</strong>B.Tech CSE · 2023–2027</div>
+      <div><strong>Thorrur, Warangal</strong>Telangana, India</div>
+      <div><strong>Focus</strong>Data analytics · AI agents · distributed systems</div>
+    </div>
+    <div class="scroll-cue"><span class="line"></span>scroll</div>
+  </section>
+
+  <div class="panel-bg">
+
+  <section id="about" class="wrap reveal">
+    <p class="eyebrow">01 about</p>
+    <div class="about-grid">
+      <div class="about-bio">
+        <p><strong>I'm Nikhil</strong> — a final-year Computer Science & Engineering student who got pulled into data analytics and stayed for the systems underneath it. I like the moment a messy spreadsheet turns into a query, and the moment a working prototype turns into something that survives a node failing at 2am.</p>
+        <p>Most recently I completed a data analytics micro-internship at Thiranex and a run of Forage virtual job simulations spanning data & technology transactions, software development, and cybersecurity — while building distributed systems and AI agent projects on the side.</p>
+        <p>Currently open to internships in data analytics and software engineering.</p>
+      </div>
+      <div class="facts-panel">
+        <div class="fact-row"><span class="fact-key">role</span><span class="fact-val">Data Analytics Enthusiast</span></div>
+        <div class="fact-row"><span class="fact-key">education</span><span class="fact-val">B.Tech CSE, 2023–2027</span></div>
+        <div class="fact-row"><span class="fact-key">location</span><span class="fact-val">Thorrur, Warangal, TG</span></div>
+        <div class="fact-row"><span class="fact-key">status</span><span class="fact-val">Open to internships</span></div>
+        <div class="fact-row"><span class="fact-key">github</span><span class="fact-val">Nikhil-creat</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="skills" class="wrap reveal">
+    <p class="eyebrow">02 skills</p>
+    <h2 class="section-title">SELECT * FROM skills;</h2>
+    <table class="schema-table">
+      <thead>
+        <tr><th>field</th><th>type</th><th>notes</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="field-name">python</td><td class="field-type">language</td><td class="field-note">pandas, data wrangling, scripting</td></tr>
+        <tr><td class="field-name">sql</td><td class="field-type">language</td><td class="field-note">querying, joins, aggregation</td></tr>
+        <tr><td class="field-name">power_bi</td><td class="field-type">tool</td><td class="field-note">dashboards, DAX, reporting</td></tr>
+        <tr><td class="field-name">excel</td><td class="field-type">tool</td><td class="field-note">pivot tables, formulas, modeling</td></tr>
+        <tr><td class="field-name">django</td><td class="field-type">framework</td><td class="field-note">backend services, REST APIs</td></tr>
+        <tr><td class="field-name">react</td><td class="field-type">framework</td><td class="field-note">component UI, state management</td></tr>
+        <tr><td class="field-name">ml_dl</td><td class="field-type">foundation</td><td class="field-note">supervised learning, neural net basics</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="projects" class="wrap reveal">
+    <p class="eyebrow">03 projects</p>
+    <h2 class="section-title">Things I've built</h2>
+    <div class="project-grid" id="project-grid" aria-live="polite">
+      <p class="term-loading">$ fetching /api/projects …</p>
+    </div>
+  </section>
+
+  <section id="experience" class="wrap reveal">
+    <p class="eyebrow">04 experience</p>
+    <h2 class="section-title">Timeline</h2>
+    <div class="timeline">
+      <div class="tl-item">
+        <span class="tl-date">2026-07 → 2026-08</span>
+        <div class="tl-title">Data Analytics Intern</div>
+        <div class="tl-org">Thiranex — micro-internship</div>
+      </div>
+      <div class="tl-item">
+        <span class="tl-date">2026-07</span>
+        <div class="tl-title">Forage Virtual Job Simulations</div>
+        <div class="tl-org">Latham & Watkins (Data & Technology Transactions) · Datacom (Software Development) · Clifford Chance (Cybersecurity Global Virtual Internship)</div>
+      </div>
+      <div class="tl-item">
+        <span class="tl-date">2023 → 2027</span>
+        <div class="tl-title">B.Tech, Computer Science & Engineering</div>
+        <div class="tl-org">Vaagdevi College of Engineering</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="certifications" class="wrap reveal">
+    <p class="eyebrow">05 certifications</p>
+    <h2 class="section-title">Credential log</h2>
+    <p class="cred-summary">33 shown here — part of an ongoing 100+, added as new ones land.</p>
+
+    <div class="cred-group">
+      <p class="cred-group-title">-- cloud &amp; cybersecurity</p>
+      <div class="cred-grid">
+        <div class="cred-card">
+          <div class="cred-top"><span class="cred-title">IT Forensic Analyst</span><span class="cred-date">Jul 2026</span></div>
+          <span class="cred-issuer">Skill India · NASSCOM</span>
+        </div>
+        <div class="cred-card">
+          <div class="cred-top"><span class="cred-title">Application Security Analyst</span><span class="cred-date">Jul 2026</span></div>
+          <span class="cred-issuer">Skill India · NASSCOM</span>
+        </div>
+        <div class="cred-card">
+          <div class="cred-top"><span class="cred-title">Cloud Security Analyst</span><span class="cred-date">Jul 2026</span></div>
+          <span class="cred-issuer">Skill India · NASSCOM</span>
+        </div>
+        <div class="cred-card">
+          <div class="cred-top"><span class="cred-title">Cloud Infrastructure Analyst</span><span class="cred-date">Jun 2026</span></div>
+          <span class="cred-issuer">Skill India · NASSCOM</span>
+        </div>
+        <div class="cred-card">
+          <div class="cred-top"><span class="cred-title">Analyst Endpoint Security – Cybersecurity</span><span class="cred-date">Jun 2026</span></div>
+          <span class="cred-issuer">Skill India · NASSCOM</span>
+        </div>
+        <div class="cred-card">
+          <div class="cred-top"><span class="cred-title">Cyber Security Consulting Simulation</span><span class="cred-date">Jul 2026</span></div>
+          <span class="cred-issuer">Forage · PwC</span>
+        </div>
+        <div class="cred-card">
+          <div class="cred-top"><span class="cred-title">Cyber Job Simulation</span><span class="cred-date">Jun 2026</span></div>
+          <span class="cred-issuer">Forage · Deloitte</span>
+        </div>
+        <div class="cred-card">
+          <div class="cred-top"><span class="cred-title">Cybersecurity Analyst Job Simulation</span><span class="cred-date">Jun 2026</span></div>
+          <span class="cred-issuer">Forage · TATA</span>
+        </div>
+        <div class="cred-card">
+          <div class="cred-top"><span class="cred-title">Shields Up: Cybersecurity Job Simulation</span><span class="cred-date">Jul 2026</span></div>
+          <span class="cred-issuer">Forage · AIG</span>
+        </div>
+        <div class="cred-card">
+          <div class="cred-top"><span class="cred-title">IoT – Security Specialist Certificate Programme</span><span class="cred-date">Jun 2026</span></div>
+          <span class="cred-issuer">Reliance Foundation Skilling Academy</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="cred-group">
+      <p class="cred-group-title">-- data, ai &amp; emerging tech</p>
+      <div class="cred-grid">
+        <div class="cred-card">
+          <div class="cred-top"><span class="cred-title">Mastering Power BI: Data Analysis &amp; Dashboard Creation</span><span class="cred-date">Jul 2026</span></div>
+          <span class="cred-issuer">Skill India · PHN Technology</span>
+        </div>
+        <div class="cred-card">
+          <div class="cred-top"><span class="cred-title">AI – Business Analyst</span><span class="cred-date">Jul 2026</span></div>
+          <span class="cred-issuer">Skill India · NASSCOM</span>
+        </div>
+        <div class="cred-card">
+          <div class="cred-top"><span class="cred-title">Blockchain Full Stack Developer</span><span class="cred-date">Jul 2026</span></div>
+          <span class="cred-issuer">Skill India · NASSCOM</span>
+        </div>
+        <div class="cred-card">
+          <div class="cred-top"><span class="cred-title">Data Analytics Job Simulation</span><span class="cred-date">Jun 2026</span></div>
+          <span class="cred-issuer">Forage · Deloitte</span>
+        </div>
+        <div class="cred-card">
+          <div class="cred-top"><span class="cred-title">GenAI for Proposal Generation Job Simulation</span><span class="cred-date">Jul 2026</span></div>
+          <span class="cred-issuer">Forage · EAB</span>
+        </div>
+        <div class="cred-card">
+          <div class="cred-top"><span class="cred-title">GenAI Powered Data Analytics Job Simulation</span><span class="cred-date">Jun 2026</span></div>
+          <span class="cred-issuer">Forage · TATA</span>
+        </div>
+        <div class="cred-card">
+          <div class="cred-top"><span class="cred-title">AI in Action Job Simulation</span><span class="cred-date">Jul 2026</span></div>
+          <span class="cred-issuer">Forage · Vista</span>
+        </div>
+        <div class="cred-card">
+          <div class="cred-top"><span class="cred-title">AI-Machine Learning Engineer Foundation Course</span><span class="cred-date">Jun 2026</span></div>
+          <span class="cred-issuer">Reliance Foundation Skilling Academy</span>
+        </div>
+        <div class="cred-card">
+          <div class="cred-top"><span class="cred-title">Artificial Intelligence Fundamentals</span><span class="cred-date">Dec 2025</span></div>
+          <span class="cred-issuer">IBM SkillsBuild</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="cred-group">
+      <p class="cred-group-title">-- automation &amp; robotics</p>
+      <div class="cred-grid">
+        <div class="cred-card">
+          <div class="cred-top"><span class="cred-title">Robotic Process Automation Developer</span><span class="cred-date">Jul 2026</span></div>
+          <span class="cred-issuer">Skill India · NASSCOM</span>
+        </div>
+        <div class="cred-card">
+          <div class="cred-top"><span class="cred-title">Test Cloud Specialist SAP</span><span class="cred-date">Jun 2026</span></div>
+          <span class="cred-issuer">UiPath</span>
+        </div>
+        <div class="cred-card">
+          <div class="cred-top"><span class="cred-title">Industry 4.0 Robotics Systems</span><span class="cred-date">Jul 2026 · 90 hrs</span></div>
+          <span class="cred-issuer">Reliance Foundation Skilling Academy</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="cred-group">
+      <p class="cred-group-title">-- software &amp; systems engineering</p>
+      <div class="cred-grid">
+        <div class="cred-card">
+          <div class="cred-top"><span class="cred-title">Working as a Software Engineer at a Start Up</span><span class="cred-date">Jul 2026</span></div>
+          <span class="cred-issuer">Forage</span>
+        </div>
+        <div class="cred-card">
+          <div class="cred-top"><span class="cred-title">IT Architecture Job Simulation</span><span class="cred-date">Jul 2026</span></div>
+          <span class="cred-issuer">Forage · BCG Platinion</span>
+        </div>
+        <div class="cred-card">
+          <div class="cred-top"><span class="cred-title">Technology Job Simulation</span><span class="cred-date">Jul 2026</span></div>
+          <span class="cred-issuer">Forage · Deloitte</span>
+        </div>
+        <div class="cred-card">
+          <div class="cred-top"><span class="cred-title">Front-End Software Engineering Job Simulation</span><span class="cred-date">Jul 2026</span></div>
+          <span class="cred-issuer">Forage · Skyscanner</span>
+        </div>
+        <div class="cred-card">
+          <div class="cred-top"><span class="cred-title">Engineering Job Simulation</span><span class="cred-date">Jul 2026</span></div>
+          <span class="cred-issuer">Forage · British Airways</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="cred-group">
+      <p class="cred-group-title">-- consulting &amp; business simulations</p>
+      <div class="cred-grid">
+        <div class="cred-card">
+          <div class="cred-top"><span class="cred-title">Technology Consulting Simulation</span><span class="cred-date">Jul 2026</span></div>
+          <span class="cred-issuer">Forage · PwC</span>
+        </div>
+        <div class="cred-card">
+          <div class="cred-top"><span class="cred-title">Data and Technology Transactions Job Simulation</span><span class="cred-date">Jul 2026</span></div>
+          <span class="cred-issuer">Forage · Latham &amp; Watkins</span>
+        </div>
+        <div class="cred-card">
+          <div class="cred-top"><span class="cred-title">IT Technical Support Executive</span><span class="cred-date">Jun 2026</span></div>
+          <span class="cred-issuer">Skill India · NASSCOM</span>
+        </div>
+        <div class="cred-card">
+          <div class="cred-top"><span class="cred-title">Energy &amp; Infrastructure Projects Job Simulation</span><span class="cred-date">Jul 2026</span></div>
+          <span class="cred-issuer">Forage · Ashurst Perkins Coie</span>
+        </div>
+        <div class="cred-card">
+          <div class="cred-top"><span class="cred-title">Technology Transfer Job Simulation</span><span class="cred-date">Jul 2026</span></div>
+          <span class="cred-issuer">Forage · LifeArc</span>
+        </div>
+        <div class="cred-card">
+          <div class="cred-top"><span class="cred-title">M&amp;A Job Simulation</span><span class="cred-date">Jul 2026</span></div>
+          <span class="cred-issuer">Forage · Morrison Foerster</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="garage" class="wrap reveal">
+    <p class="eyebrow">06 garage</p>
+    <h2 class="section-title">The Garage</h2>
+    <div class="facts-panel" style="max-width:560px;">
+      <p style="color:var(--text-muted); margin-bottom:16px; line-height:1.6;">A small 3D showcase, separate from the résumé content — two stylized, low-poly cars (an original sports coupe and a grand tourer) built in Three.js, rendered in the same visual language as this site.</p>
+      <a class="btn btn-primary" href="garage.html">Open the garage ↗</a>
+    </div>
+  </section>
+
+  <section id="contact" class="wrap reveal">
+    <p class="eyebrow">07 contact</p>
+    <div class="contact-grid">
+      <div class="query-block">
+        <span class="cm">-- get in touch</span><br>
+        <span class="kw">SELECT</span> * <span class="kw">FROM</span> contact<br>
+        <span class="kw">WHERE</span> topic <span class="kw">IN</span> (<span class="str">'internships'</span>, <span class="str">'collaboration'</span>, <span class="str">'data projects'</span>);
+      </div>
+      <div class="contact-links">
+        <a class="contact-link" href="https://github.com/Nikhil-creat" target="_blank" rel="noopener">
+          <span>
+            <span class="k">github</span>
+            <span class="v">github.com/Nikhil-creat</span>
+          </span>
+        </a>
+        <a class="contact-link" href="https://in.linkedin.com/in/nikhil-chary-sriramoju-95041b38a" target="_blank" rel="noopener">
+          <span>
+            <span class="k">linkedin</span>
+            <span class="v">nikhil-chary-sriramoju</span>
+          </span>
+        </a>
+        <a class="contact-link" href="mailto:sriramojunikhil66@gmail.com">
+          <span>
+            <span class="k">email</span>
+            <span class="v">sriramojunikhil66@gmail.com</span>
+          </span>
+        </a>
+        <div class="contact-link">
+          <span>
+            <span class="k">location</span>
+            <span class="v">Thorrur, Warangal, Telangana</span>
+          </span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap reveal" style="padding:0 24px 64px;">
+    <div class="term-card" style="max-width:640px;">
+      <div class="term-bar">
+        <span>~/meta/build-notes.md</span>
+      </div>
+      <div class="term-body">
+        <p style="color:var(--text-muted); line-height:1.6; margin-bottom:14px;">Design &amp; engineering — <span style="color:var(--text-primary); font-weight:600;">Sriramoju Nikhil Chary</span>. The cluster-graph hero, the scroll-linked background, the schema-styled skills table, the terminal-card sections — all hand-built, no template or site builder.</p>
+        <div class="tag-row">
+          <span class="tag">Three.js</span>
+          <span class="tag">WebGL</span>
+          <span class="tag">Vanilla JS</span>
+          <span class="tag">CSS Grid</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  </div><!-- /panel-bg -->
+
+</main>
+
+<footer>built with curiosity for data · © 2026 sriramoju nikhil chary</footer>
+
+<script>
+  // ---------- scroll progress (drives background motion) ----------
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let scrollProgress = 0;
+  const scrollGlowEl = document.getElementById('scroll-glow');
+  function computeScrollProgress() {
+    const doc = document.documentElement;
+    const scrollTop = window.scrollY || doc.scrollTop;
+    const maxScroll = doc.scrollHeight - doc.clientHeight;
+    scrollProgress = maxScroll > 0 ? Math.min(1, Math.max(0, scrollTop / maxScroll)) : 0;
+    if (scrollGlowEl && !prefersReducedMotion) scrollGlowEl.style.top = (-20 + scrollProgress * 140) + '%';
+  }
+  window.addEventListener('scroll', computeScrollProgress, { passive: true });
+  window.addEventListener('resize', computeScrollProgress);
+  computeScrollProgress();
+  if (prefersReducedMotion && scrollGlowEl) scrollGlowEl.style.display = 'none';
+
+  // ---------- mobile nav ----------
+  const navToggle = document.getElementById('navToggle');
+  const navLinks = document.getElementById('navLinks');
+  navToggle.addEventListener('click', () => {
+    const open = navLinks.classList.toggle('open');
+    navToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+  navLinks.querySelectorAll('a').forEach(a => {
+    a.addEventListener('click', () => {
+      navLinks.classList.remove('open');
+      navToggle.setAttribute('aria-expanded', 'false');
+    });
+  });
+
+  // ---------- dynamic projects (from API) ----------
+  function escapeHtml(str) {
+    return String(str || '').replace(/[&<>"']/g, c => (
+      { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+    ));
+  }
+
+  function renderProjectCard(p) {
+    const isShipped = p.status === 'shipped';
+    const statusClass = isShipped ? 'shipped' : 'progress';
+    const statusText = isShipped ? 'shipped' : 'in development';
+    const tags = (p.tags || []).map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('');
+    const link = p.repoLink
+      ? `<a class="term-link" href="${escapeHtml(p.repoLink)}" target="_blank" rel="noopener">view repo →</a>`
+      : '';
+    return `
+      <div class="term-card">
+        <div class="term-bar">
+          <span>${escapeHtml(p.path)}</span>
+          <span class="status-tag ${statusClass}">● ${statusText}</span>
+        </div>
+        <div class="term-body">
+          <h3 class="term-title">${escapeHtml(p.title)}</h3>
+          <p class="term-desc">${escapeHtml(p.description)}</p>
+          <div class="tag-row">${tags}</div>
+          ${link}
+        </div>
+      </div>`;
+  }
+
+  async function loadProjects() {
+    const grid = document.getElementById('project-grid');
+    try {
+      const res = await fetch('/api/projects');
+      if (!res.ok) throw new Error('bad response');
+      const projects = await res.json();
+      grid.innerHTML = projects.length
+        ? projects.map(renderProjectCard).join('')
+        : '<p class="term-loading">No projects yet — check back soon.</p>';
+    } catch (err) {
+      grid.innerHTML = '<p class="term-loading">Couldn\'t reach the projects API right now. Refresh to try again.</p>';
+    }
+  }
+  loadProjects();
+
+  // ---------- scroll reveal ----------
+  const revealEls = document.querySelectorAll('.reveal');
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in-view');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    revealEls.forEach(el => io.observe(el));
+  } else {
+    revealEls.forEach(el => el.classList.add('in-view'));
+  }
+
+  // ---------- 3D cluster-graph hero ----------
+  (function () {
+    const canvas = document.getElementById('bg-canvas');
+    const reduceMotion = prefersReducedMotion;
+
+    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+    renderer.setClearColor(0x000000, 0);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 100);
+    camera.position.set(0, 0, 12);
+
+    const graph = new THREE.Group();
+    scene.add(graph);
+
+    // -- glow texture factory --
+    function makeGlowTexture(hex) {
+      const size = 128;
+      const c = document.createElement('canvas');
+      c.width = size; c.height = size;
+      const ctx = c.getContext('2d');
+      const g = ctx.createRadialGradient(size/2, size/2, 0, size/2, size/2, size/2);
+      g.addColorStop(0, hex + 'FF');
+      g.addColorStop(0.4, hex + 'AA');
+      g.addColorStop(1, hex + '00');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, size, size);
+      return new THREE.CanvasTexture(c);
+    }
+
+    const cyanTex = makeGlowTexture('#4FD8C4');
+    const amberTex = makeGlowTexture('#F2A649');
+
+    // -- node positions --
+    const NUM_NODES = 30;
+    const RADIUS = 6.5;
+    const positions = [];
+    for (let i = 0; i < NUM_NODES; i++) {
+      const u = Math.random();
+      const costheta = Math.random() * 2 - 1;
+      const theta = Math.acos(costheta);
+      const phi = Math.random() * 2 * Math.PI;
+      const r = RADIUS * Math.cbrt(0.4 + 0.6 * u);
+      positions.push(new THREE.Vector3(
+        r * Math.sin(theta) * Math.cos(phi),
+        r * Math.sin(theta) * Math.sin(phi),
+        r * Math.cos(theta)
+      ));
+    }
+
+    // -- nearest-neighbour edges --
+    function buildEdges(pts, k) {
+      const seen = new Set();
+      const edges = [];
+      for (let i = 0; i < pts.length; i++) {
+        const dists = [];
+        for (let j = 0; j < pts.length; j++) {
+          if (i === j) continue;
+          dists.push({ j, d: pts[i].distanceTo(pts[j]) });
+        }
+        dists.sort((a, b) => a.d - b.d);
+        for (let n = 0; n < k && n < dists.length; n++) {
+          const j = dists[n].j;
+          const key = i < j ? i + '_' + j : j + '_' + i;
+          if (!seen.has(key)) { seen.add(key); edges.push([i, j]); }
+        }
+      }
+      return edges;
+    }
+    const edges = buildEdges(positions, 3);
+
+    // -- edge lines --
+    const lineVerts = new Float32Array(edges.length * 2 * 3);
+    edges.forEach(([a, b], idx) => {
+      lineVerts.set([positions[a].x, positions[a].y, positions[a].z], idx * 6);
+      lineVerts.set([positions[b].x, positions[b].y, positions[b].z], idx * 6 + 3);
+    });
+    const lineGeo = new THREE.BufferGeometry();
+    lineGeo.setAttribute('position', new THREE.BufferAttribute(lineVerts, 3));
+    const lineMat = new THREE.LineBasicMaterial({
+      color: 0x4FD8C4, transparent: true, opacity: 0.16,
+      blending: THREE.AdditiveBlending, depthWrite: false
+    });
+    graph.add(new THREE.LineSegments(lineGeo, lineMat));
+
+    // -- node sprites --
+    positions.forEach(p => {
+      const mat = new THREE.SpriteMaterial({
+        map: cyanTex, transparent: true, depthWrite: false,
+        blending: THREE.AdditiveBlending, opacity: 0.8
+      });
+      const sprite = new THREE.Sprite(mat);
+      sprite.position.copy(p);
+      const s = 0.42 + Math.random() * 0.25;
+      sprite.scale.set(s, s, 1);
+      graph.add(sprite);
+    });
+
+    // -- travelling packets --
+    const NUM_PACKETS = reduceMotion ? 0 : 16;
+    const packets = [];
+    for (let i = 0; i < NUM_PACKETS; i++) {
+      const mat = new THREE.SpriteMaterial({
+        map: amberTex, transparent: true, depthWrite: false,
+        blending: THREE.AdditiveBlending, opacity: 0.95
+      });
+      const sprite = new THREE.Sprite(mat);
+      sprite.scale.set(0.5, 0.5, 1);
+      const edge = edges[Math.floor(Math.random() * edges.length)];
+      const p = { edge, t: Math.random(), speed: 0.12 + Math.random() * 0.22, sprite };
+      sprite.position.lerpVectors(positions[edge[0]], positions[edge[1]], p.t);
+      graph.add(sprite);
+      packets.push(p);
+    }
+
+    // -- resize --
+    function onResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      if (reduceMotion) renderer.render(scene, camera);
+    }
+    window.addEventListener('resize', onResize);
+
+    // -- mouse parallax --
+    let mouseX = 0, mouseY = 0;
+    if (!reduceMotion) {
+      window.addEventListener('mousemove', (e) => {
+        mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+        mouseY = (e.clientY / window.innerHeight) * 2 - 1;
+      });
+    }
+
+    if (reduceMotion) {
+      renderer.render(scene, camera);
+      return;
+    }
+
+    const clock = new THREE.Clock();
+    let rotY = 0;
+
+    function animate() {
+      requestAnimationFrame(animate);
+      const delta = Math.min(clock.getDelta(), 0.05);
+      const t = clock.elapsedTime;
+
+      rotY += delta * 0.045;
+      graph.rotation.y = rotY + mouseX * 0.18 + scrollProgress * 2.6;
+      graph.rotation.x = Math.sin(t * 0.15) * 0.08 + mouseY * 0.12 + scrollProgress * 0.4;
+
+      const targetZ = 12 - scrollProgress * 4.2;
+      camera.position.z += (targetZ - camera.position.z) * 0.06;
+
+      packets.forEach(p => {
+        p.t += p.speed * delta;
+        if (p.t >= 1) {
+          p.t = 0;
+          p.edge = edges[Math.floor(Math.random() * edges.length)];
+        }
+        p.sprite.position.lerpVectors(positions[p.edge[0]], positions[p.edge[1]], p.t);
+      });
+
+      renderer.render(scene, camera);
+    }
+    animate();
+  })();
+</script>
+
+</body>
+</html>
