@@ -1,4 +1,4 @@
-# Nikhil Portfolio — Full-Stack Build
+# NIKHIL Portfolio — Full-Stack Build
 
 Turns the static portfolio into a real full-stack app for the Thiranex
 "Personal Portfolio Website" task:
@@ -98,3 +98,15 @@ Only the **Projects** section of `index.html`: the four hardcoded cards were
 replaced with a container that fetches `/api/projects` and renders the same
 markup client-side. Everything else (About, Skills, Experience,
 Certifications, Contact, the 3D hero) is untouched.
+
+## 👤 About the Builder
+
+**NIKHIL CHARY SRIRAMOJU**
+B.Tech Final Year — Computer Science & Engineering
+
+- 🔗 LinkedIn: [nikhil-chary-sriramoju](https://in.linkedin.com/in/nikhil-chary-sriramoju-95041b38a)
+- 💻 GitHub: [Nikhil-creat](https://github.com/Nikhil-creat)
+- 📧 Email: sriramojunikhil66@gmail.com
+- 📸 Instagram: [nikhil__sriramoju](https://www.instagram.com/nikhil__sriramoju)
+
+  
